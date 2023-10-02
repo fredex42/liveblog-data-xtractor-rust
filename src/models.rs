@@ -10,12 +10,36 @@ pub struct CapiBlockAttributes {
     pub pinned:bool,
 }
 
+impl CapiBlockAttributes {
+    pub fn clone(&self) -> CapiBlockAttributes {
+        CapiBlockAttributes { 
+            summary: self.summary, 
+            title: match &self.title {
+                Some(t)=>Some(t.to_owned()),
+                None=>None
+            },
+            pinned: self.pinned
+         }
+    }
+}
+
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CapiBlock {
     pub id:String,
     pub bodyHtml:String,
     pub attributes:CapiBlockAttributes,
     pub firstPublishedDate:String,
+}
+
+impl CapiBlock {
+    pub fn clone(&self) -> CapiBlock {
+        CapiBlock { 
+            id: self.id.to_owned(), 
+            bodyHtml: self.bodyHtml.to_owned(), 
+            attributes: self.attributes.clone(),
+            firstPublishedDate: self.firstPublishedDate.to_owned(),
+         }
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -43,51 +67,61 @@ impl CapiBlocksContainer {
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CapiDocument {
-    id:String,
-    r#type: String,
-    webPublicationDate: DateTime<FixedOffset>,
-    blocks: CapiBlocksContainer,
-    tags: Vec<CapiTag>
+    pub id:String,
+    pub r#type: String,
+    pub webPublicationDate: DateTime<FixedOffset>,
+    pub blocks: CapiBlocksContainer,
+    pub tags: Vec<CapiTag>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CapiResponse {
-    status:String,
-    userTier:String,
-    total: u64,
-    startIndex: u64,
-    pageSize: u32,
-    currentPage: u64,
-    pages: u64,
-    orderBy: String,
-    results: Vec<CapiDocument>
+    pub status:String,
+    pub userTier:String,
+    pub total: u64,
+    pub startIndex: u64,
+    pub pageSize: u32,
+    pub currentPage: u64,
+    pub pages: u64,
+    pub orderBy: String,
+    pub results: Vec<CapiDocument>
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CapiResponseEnvelope {
-    response:CapiResponse,
+    pub response:CapiResponse,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct SummarisedContent {
-    summary:CapiBlock,
-    events: Vec<CapiBlock>,
+    pub summary: Option<CapiBlock>,
+    pub events: Vec<CapiBlock>,
 }
 
 impl SummarisedContent {
-    pub fn is_empty_summary(&self) -> bool {
-        return self.summary.bodyHtml == "" && self.summary.id == ""
+    pub fn new(summary:CapiBlock, events: Vec<CapiBlock>) -> SummarisedContent {
+        SummarisedContent {
+            summary: Some(summary),
+            events: events,
+        }
+    }
+
+    pub fn unsummarised(events: Vec<CapiBlock>) -> SummarisedContent {
+        SummarisedContent {
+            summary: None,
+            events: events
+        }
     }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Stats {
-    original_id:String,
-    web_publication_date: DateTime<FixedOffset>,
-    retrieved_at: DateTime<FixedOffset>,
-    summary_block_count: u64,
-    total_block_count: u64,
-    keyword_tags: Vec<CapiTag>,
+    pub original_id:String,
+    pub web_publication_date: DateTime<FixedOffset>,
+    pub retrieved_at: DateTime<FixedOffset>,
+    pub summary_block_count: u64,
+    pub total_block_count: u64,
+    pub keyword_tags: Vec<CapiTag>,
 }
 
 impl Stats {
