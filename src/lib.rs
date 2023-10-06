@@ -1,6 +1,7 @@
 mod models;
 mod capi;
 mod chopper;
+mod writer;
 use chopper::run_the_chopper;
 use clap::Parser;
 use models::SummarisedContent;

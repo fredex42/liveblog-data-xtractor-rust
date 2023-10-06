@@ -102,18 +102,11 @@ impl SummarisedContent {
     pub fn empty() -> SummarisedContent {
         SummarisedContent { summary: None, events: vec!() }
     }
-    
+
     pub fn new(summary:CapiBlock, events: Vec<CapiBlock>) -> SummarisedContent {
         SummarisedContent {
             summary: Some(summary),
             events: events,
-        }
-    }
-
-    pub fn unsummarised(events: Vec<CapiBlock>) -> SummarisedContent {
-        SummarisedContent {
-            summary: None,
-            events: events
         }
     }
 }
