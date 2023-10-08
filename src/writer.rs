@@ -18,11 +18,19 @@ fn dir_name_from_capi_id(capi_id:&str) -> &str {
 }
 
 fn write_block_to_file(file_name:&String, b:&SummarisedContent) -> Result<(), Box<dyn Error>> {
-    let mut file = File::create(file_name)?;
+    let file = File::create(file_name)?;
     match serde_json::to_writer(file, b) {
         Ok(_)=>Ok(()),
         Err(e)=>Err(Box::new(e))
     }
+}
+
+fn write_summary_to_file(file_name:&String, s:&Stats) -> Result<(), Box<dyn Error>> {
+    let file = File::create(file_name)?;
+    match serde_json::to_writer(file, s) {
+        Ok(_)=>Ok(()),
+        Err(e)=>Err(Box::new(e))
+    } 
 }
 
 pub fn write_out_data(base_path:&str, capi_id:&str, chopped_blocks:&Vec<SummarisedContent>, stats:&Stats) -> Result<(), Box<dyn Error>> {
@@ -38,6 +46,9 @@ pub fn write_out_data(base_path:&str, capi_id:&str, chopped_blocks:&Vec<Summaris
         write_block_to_file(&file_name, block)?
     }
 
+    let file_name = format!("{}/{}/META.json", base_path, dir_name);
+
     //finally write out the metadata stats
+    write_summary_to_file(&file_name, stats)?;
     Ok(())
 }

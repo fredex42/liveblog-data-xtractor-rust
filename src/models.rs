@@ -55,6 +55,12 @@ pub struct CapiTag {
     pub r#type:String,
 }
 
+impl Clone for CapiTag {
+    fn clone(&self)->Self {
+        CapiTag { id: self.id.to_owned(), webTitle: self.webTitle.to_owned(), r#type: self.r#type.to_owned() }
+    }
+}
+
 impl CapiBlocksContainer {
     pub fn count_body_blocks(&self) -> usize {
         return self.body.len();
@@ -112,16 +118,16 @@ impl SummarisedContent {
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-pub struct Stats {
-    pub original_id:String,
+pub struct Stats<'a> {
+    pub original_id:&'a str,
     pub web_publication_date: DateTime<FixedOffset>,
     pub retrieved_at: DateTime<FixedOffset>,
-    pub summary_block_count: u64,
-    pub total_block_count: u64,
+    pub summary_block_count: usize,
+    pub total_block_count: usize,
     pub keyword_tags: Vec<CapiTag>,
 }
 
-impl Stats {
+impl Stats<'_> {
     #[inline]
     pub fn write_json(&self, to: &mut dyn io::Write) -> Result<(), serde_json::Error> {
         return serde_json::to_writer(to, self)
@@ -230,7 +236,7 @@ mod tests {
     #[test]
     pub fn test_write_stats_json() {
         let to_test = Stats {
-            original_id: "original-id-here".to_owned(),
+            original_id: "original-id-here",
             web_publication_date: DateTime::parse_from_rfc3339("2022-01-02T03:04:05.678Z").unwrap(),
             retrieved_at: DateTime::parse_from_rfc3339("2022-01-02T03:04:05.678Z").unwrap(),
             summary_block_count: 1,
