@@ -7,19 +7,25 @@ use chrono::{DateTime, Utc};
 use itertools::Itertools;
 use writer::write_out_data;
 use clap::Parser;
-use models::{SummarisedContent, Stats, CapiTag};
+use models::{Stats, CapiTag};
 use std::{error::Error, time::SystemTime};
-use std::iter::Filter;
 use reqwest::Client;
 use capi::make_capi_request;
 
 #[derive(Parser)]
+#[command(author, version, about, long_about = None)]
 pub struct Cli {
+    #[arg(short,long)]
     capi_key:String,
+    #[arg(short,long)]
     query_tag:String,
+    #[arg(short,long)]
     output_path:String,
+    #[arg(short,long)]
     limit:u16,
-    page_size:u16,
+    #[arg(short,long)]
+    page_size:Option<u32>,
+    #[arg(short,long)]
     drop_no_summary:bool
 }
 
@@ -31,10 +37,13 @@ pub async fn run(args:Cli) -> Result<(), Box<dyn Error>> {
     let http_client = Client::builder().build()?;
 
     let mut page_counter = 1;
-    let mut summaries:Vec<SummarisedContent> = Vec::new();
 
     loop {
-        let content = make_capi_request(&http_client, args.capi_key.to_owned(), args.query_tag.to_owned(), page_counter, u32::from(args.page_size)).await?;
+        let content = make_capi_request(&http_client, 
+            args.capi_key.to_owned(), 
+            args.query_tag.to_owned(), 
+            page_counter, 
+            u32::from(args.page_size.unwrap_or(10))).await?;
 
         if content.response.results.len()==0 {
             println!("INFO Reached the last page of results, finishing");
