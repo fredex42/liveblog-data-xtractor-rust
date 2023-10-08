@@ -34,19 +34,29 @@ fn write_summary_to_file(file_name:&String, s:&Stats) -> Result<(), Box<dyn Erro
 }
 
 pub fn write_out_data(base_path:&str, capi_id:&str, chopped_blocks:&Vec<SummarisedContent>, stats:&Stats) -> Result<(), Box<dyn Error>> {
-    let dir_name = dir_name_from_capi_id(capi_id);
+    let dir_name = format!("{}/{}", base_path, dir_name_from_capi_id(capi_id));
 
-    //deliberately ignore the error here, because the dir might already exist.
-    let _ = create_dir_all(dir_name);
+    match create_dir_all(&dir_name) {
+        Ok(_)=> (),
+        Err(e) => println!("WARNING unable to create {}: {}", dir_name, e),
+    }
+
+    println!("DEBUG dirname is {}", dir_name);
 
     //now write out all the summarised blocks we found
     for block in chopped_blocks.iter() {
         let id_to_use:String = block.summary.as_ref().map_or_else(|| "HEAD".to_owned(), |summ| summ.id.clone());
-        let file_name = format!("{}/{}/{}.json", base_path, dir_name, id_to_use);
-        write_block_to_file(&file_name, block)?
+        let file_name = format!("{}/{}.json",dir_name, id_to_use);
+        match write_block_to_file(&file_name, block) {
+            Ok(_)=>continue,
+            Err(e)=>{
+                println!("ERROR Could not write to {}: {}", file_name, e);
+                break;
+            }
+        }
     }
 
-    let file_name = format!("{}/{}/META.json", base_path, dir_name);
+    let file_name = format!("{}/META.json", dir_name);
 
     //finally write out the metadata stats
     write_summary_to_file(&file_name, stats)?;
