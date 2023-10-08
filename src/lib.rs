@@ -8,7 +8,7 @@ use itertools::Itertools;
 use writer::write_out_data;
 use clap::Parser;
 use models::{Stats, CapiTag};
-use std::{error::Error, time::SystemTime};
+use std::{error::Error, time::SystemTime, path::PathBuf};
 use reqwest::Client;
 use capi::make_capi_request;
 
@@ -20,7 +20,7 @@ pub struct Cli {
     #[arg(short,long)]
     query_tag:String,
     #[arg(short,long)]
-    output_path:String,
+    output_path:Option<String>,
     #[arg(short,long)]
     limit:u16,
     #[arg(short,long)]
@@ -37,6 +37,19 @@ pub async fn run(args:Cli) -> Result<(), Box<dyn Error>> {
     let http_client = Client::builder().build()?;
 
     let mut page_counter = 1;
+
+    let output_path = args.output_path.unwrap_or_else(|| {
+        match std::env::current_dir() {
+            Ok(p)=> {
+                let s = p.as_path().as_os_str().to_str().unwrap_or("/");
+                String::from(s)
+            },
+            Err(e)=>{
+                println!("ERROR Could not get current working directory: {}", e);
+                String::from("/")
+            }
+        }
+    });
 
     loop {
         let content = make_capi_request(&http_client, 
@@ -64,7 +77,7 @@ pub async fn run(args:Cli) -> Result<(), Box<dyn Error>> {
                 keyword_tags: filter_tags_by_type(&liveblog.tags, "keyword").map(|t| t.clone()).collect_vec(),
             };
 
-            match write_out_data(&args.output_path, &liveblog.id, &summaries, &stats) {
+            match write_out_data(&output_path, &liveblog.id, &summaries, &stats) {
                 Ok(_) => (),
                 Err(e)=> {
                     return Err(e);

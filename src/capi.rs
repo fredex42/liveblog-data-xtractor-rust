@@ -41,8 +41,16 @@ async fn internal_make_request(client: &reqwest::Client, url:&str) -> Result<Cap
     let body = response.bytes().await?;
 
     if status==200 {
-        let content:CapiResponseEnvelope = serde_json::from_slice(&body)?;
-        return Ok(content);
+        match serde_json::from_slice(&body) {
+            Ok(content)=>return Ok(content),
+            Err(e)=>{
+                println!("ERROR could not unmarshal content: {}", e);
+                let body_string:Vec<u8> = body.into_iter().collect();
+                let content_string = String::from_utf8(body_string).unwrap_or(String::from("(not utf)"));
+                println!("Body was: {}", content_string);
+                return Err(Box::new(e))
+            }
+        }
     } else {
         let content = std::str::from_utf8(&body).unwrap_or("invalid UTF data");
         return Err(Box::new(CapiError::new(status, content)));

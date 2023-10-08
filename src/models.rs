@@ -5,9 +5,9 @@ use std::str;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct CapiBlockAttributes {
-    pub summary:bool,
+    pub summary:Option<bool>,
     pub title:Option<String>,
-    pub pinned:bool,
+    pub pinned:Option<bool>,
 }
 
 impl CapiBlockAttributes {
@@ -67,7 +67,7 @@ impl CapiBlocksContainer {
     }
 
     pub fn count_summary_blocks(&self) -> usize {
-        self.body.iter().filter(|b| b.attributes.summary).count()
+        self.body.iter().filter(|b| b.attributes.summary.unwrap_or(false)).count()
     }
 }
 
@@ -156,7 +156,7 @@ mod tests {
             main: CapiBlock {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
-                attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                 firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
             },
             body: vec!(),
@@ -171,26 +171,26 @@ mod tests {
             main: CapiBlock {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
-                attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                 firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
             },
             body: vec!(
                 CapiBlock {
                     id: "fred".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
                 CapiBlock {
                     id: "kate".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: true, title: Some("this is a summary".to_owned()), pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(true), title: Some("this is a summary".to_owned()), pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
                 CapiBlock {
                     id: "bob".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
             ),
@@ -205,26 +205,26 @@ mod tests {
             main: CapiBlock {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
-                attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                 firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
             },
             body: vec!(
                 CapiBlock {
                     id: "fred".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
                 CapiBlock {
                     id: "kate".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: true, title: Some("this is a summary".to_owned()), pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(true), title: Some("this is a summary".to_owned()), pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
                 CapiBlock {
                     id: "bob".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                    attributes: CapiBlockAttributes { summary: Some(true), title: None, pinned: Some(false) },
                     firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
                 },
             ),

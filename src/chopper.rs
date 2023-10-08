@@ -4,7 +4,7 @@ use core::slice::Iter;
 fn recursive_chopper(mut i:Iter<CapiBlock>, mut summaries:Vec<SummarisedContent>, mut current:SummarisedContent) -> Vec<SummarisedContent>{
     match i.next() {
         Some(block)=>
-            if block.attributes.summary {   //we reached a summary, start a new block of summarised content
+            if block.attributes.summary.unwrap_or(false) {   //we reached a summary, start a new block of summarised content
                 summaries.push(current);
                 return recursive_chopper(i, summaries, SummarisedContent::new(block.clone(), vec!()));
             } else {
@@ -50,9 +50,9 @@ mod tests {
                 id: format!("{}", i),
                 bodyHtml: template_text.format(&[i]),
                 attributes: CapiBlockAttributes { 
-                    summary: most_recent_summary,
+                    summary: Some(most_recent_summary),
                     title: Some(format!("Block {}", i)),
-                    pinned: false,
+                    pinned: Some(false),
                 },
                 firstPublishedDate: "".to_owned(),
             });
@@ -71,7 +71,7 @@ mod tests {
             main: CapiBlock { 
                 id: "fake-main".to_owned(),
                 bodyHtml: "".to_owned(),
-                attributes: CapiBlockAttributes { summary: false, title: None, pinned: false },
+                attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                 firstPublishedDate: "".to_owned(),
             },
             body: gen_blocks(99, "This is block number {}", &summary_locations),
