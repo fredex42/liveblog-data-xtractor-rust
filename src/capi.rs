@@ -57,40 +57,23 @@ async fn internal_make_request(client: &reqwest::Client, url:&str) -> Result<Cap
     }
 }
 
-async fn with_retry<T, F>(client: &reqwest::Client, mut f:F, retry_delay:Duration) -> Result<T, Box<dyn Error>>
-where
-    T: Any,
-    F: FnMut() -> Result<T, Box<dyn Error>>,
-    //F: FnMut() -> dyn Future<Output = Result<T, Box<dyn Error>>,
-    //F: FnMut() -> dyn Future<Output = Result<T, Box<dyn Error>>,
-{
-    loop {
-        match f() {
-            Ok(content)=>return Ok(content),
-            Err(err)=>
-                match err.downcast_ref::<CapiError>() {
-                    Some(capi_err)=>
-                        if capi_err.should_retry() {
-                            std::thread::sleep(retry_delay);
-                            continue;
-                        } else {
-                            return Err(err);
-                        }
-                    None=>
-                        return Err(err)
-                }
-        }
-    }
-}
-
-pub async fn make_capi_request(client: &reqwest::Client, capi_key:String, query_tag:String, pageCounter:u64, pageSize:u32) -> Result<CapiResponseEnvelope, Box<dyn Error>> {
+/// Public method to request content from the Content Application Programmer's Interface.
+/// # Arguments:
+/// 
+/// * `client` - Immutable reference to an HTTP client (provided by Reqwest) for making the http requests with
+/// * `capi_key` - String of the API key to use
+/// * `query_tag` - Tags query to use. This takes the form of a comma-separated list of tag IDs (for AND) or a pipe-separated list of tag IDs (for OR). Any tag ID can be negated by appending a - sign
+/// * `page_counter` - Number of the page to retrieve. Pages start at 1.
+/// * `page_size` - Number of items to retrieve on a page
+/// * `retry_delay` - a Duration representing the amount of time to wait between unsuccessful requests. Note that there is no retry for 4xx requests.
+pub async fn make_capi_request(client: &reqwest::Client, capi_key:String, query_tag:String, page_counter:u64, page_size:u32, retry_delay:Option<Duration>) -> Result<CapiResponseEnvelope, Box<dyn Error>> {
     let args = HashMap::from([
         ("api-key", capi_key),
         ("show-tags", String::from("all")),
         ("tag", query_tag),
         ("show-blocks", String::from("all")),
-        ("page", format!("{}", pageCounter)),
-        ("page-size", format!("{}", pageSize))
+        ("page", format!("{}", page_counter)),
+        ("page-size", format!("{}", page_size))
     ]);
 
     let argstring:String = args.iter()
@@ -100,22 +83,31 @@ pub async fn make_capi_request(client: &reqwest::Client, capi_key:String, query_
     
     let url = format!("https://content.guardianapis.com/search?{}", argstring);
 
-    return internal_make_request(client, &url).await;
+    loop {
+        match internal_make_request(client, &url).await {
+            Ok(content)=>return Ok(content),
+            Err(err)=>
+                match err.downcast_ref::<CapiError>() {
+                    Some(capi_err)=>
+                        if capi_err.should_retry() {
+                            std::thread::sleep(retry_delay.unwrap_or(Duration::from_secs(2)));
+                            continue;
+                        } else {
+                            return Err(err);
+                        },
+                    None=>return Err(err)
+                }
+        }
+    }
 
-    //return with_retry(client, || internal_make_request(client, &url).await?, Duration::from_secs(5))
+}
 
-    // match internal_make_request(client, &url).await {
-    //     Ok(content)=> Ok(content),
-    //     Err(err)=>
-    //         match err.downcast_ref::<CapiError>() {
-    //             Some(capi_err)=>
-    //                 if capi_err.should_retry() {
-    //                     std::thread::sleep(Duration::from_secs(5));
-    //                     return make_capi_request(client, capi_key, query_tag, pageCounter, pageSize).await
-    //                 } else {
-    //                     return Err(err)
-    //                 }
-    //             None=>Err(err)
-    //         }
-    // }
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    pub fn make_capi_request_success() {
+
+    }
 }
