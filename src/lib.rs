@@ -8,7 +8,7 @@ use itertools::Itertools;
 use writer::write_out_data;
 use clap::Parser;
 use models::{Stats, CapiTag};
-use std::{error::Error, time::SystemTime, path::PathBuf};
+use std::{error::Error, time::{SystemTime, Duration}, path::PathBuf};
 use reqwest::Client;
 use capi::make_capi_request;
 
@@ -56,7 +56,10 @@ pub async fn run(args:Cli) -> Result<(), Box<dyn Error>> {
             args.capi_key.to_owned(), 
             args.query_tag.to_owned(), 
             page_counter, 
-            u32::from(args.page_size.unwrap_or(10))).await?;
+            u32::from(args.page_size.unwrap_or(10)), 
+            None,
+            None,
+            None).await?;
 
         if content.response.results.len()==0 {
             println!("INFO Reached the last page of results, finishing");

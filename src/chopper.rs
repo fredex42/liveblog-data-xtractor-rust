@@ -54,7 +54,7 @@ mod tests {
                     title: Some(format!("Block {}", i)),
                     pinned: Some(false),
                 },
-                firstPublishedDate: "".to_owned(),
+                firstPublishedDate: None,
             });
 
             i-=1;
@@ -72,7 +72,7 @@ mod tests {
                 id: "fake-main".to_owned(),
                 bodyHtml: "".to_owned(),
                 attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                firstPublishedDate: "".to_owned(),
+                firstPublishedDate: None,
             },
             body: gen_blocks(99, "This is block number {}", &summary_locations),
         };
