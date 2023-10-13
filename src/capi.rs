@@ -12,7 +12,8 @@ use itertools::Itertools;
 ///
 /// To see if an error is a CapiError, you can:
 /// 
-/// ```rust
+/// ```ignore
+/// let err:Error;
 /// match err.downcast_ref::<CapiError>() {
 ///   Some(capi_err)=>println!("{} can retry? {}", capi_err, capi_err.should_retry()),
 ///   None=>println!("Not a CAPI error")

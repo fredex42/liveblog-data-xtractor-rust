@@ -224,7 +224,7 @@ mod tests {
                 CapiBlock {
                     id: "bob".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
-                    attributes: CapiBlockAttributes { summary: Some(true), title: None, pinned: Some(false) },
+                    attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
                     firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
             ),
