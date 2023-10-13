@@ -28,7 +28,7 @@ pub struct CapiBlock {
     pub id:String,
     pub bodyHtml:String,
     pub attributes:CapiBlockAttributes,
-    pub firstPublishedDate:String,
+    pub firstPublishedDate:Option<String>,
 }
 
 impl CapiBlock {
@@ -157,7 +157,7 @@ mod tests {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
                 attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
             },
             body: vec!(),
         };
@@ -172,26 +172,26 @@ mod tests {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
                 attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
             },
             body: vec!(
                 CapiBlock {
                     id: "fred".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
                 CapiBlock {
                     id: "kate".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(true), title: Some("this is a summary".to_owned()), pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
                 CapiBlock {
                     id: "bob".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
             ),
         };
@@ -206,26 +206,26 @@ mod tests {
                 id: "fred".to_owned(),
                 bodyHtml: "<b>Test</b".to_owned(),
                 attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
             },
             body: vec!(
                 CapiBlock {
                     id: "fred".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(false), title: None, pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
                 CapiBlock {
                     id: "kate".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(true), title: Some("this is a summary".to_owned()), pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
                 CapiBlock {
                     id: "bob".to_owned(),
                     bodyHtml: "<b>Test</b".to_owned(),
                     attributes: CapiBlockAttributes { summary: Some(true), title: None, pinned: Some(false) },
-                    firstPublishedDate: "2022-01-02T03:04:05Z".to_owned()
+                    firstPublishedDate: Some("2022-01-02T03:04:05Z".to_owned())
                 },
             ),
         };
